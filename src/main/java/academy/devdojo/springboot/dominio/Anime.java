@@ -1,11 +1,23 @@
 package academy.devdojo.springboot.dominio;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data //Cria getters and setters e outros
-@AllArgsConstructor //Gera o construtor com todos os valores
+@Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Anime {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 }
