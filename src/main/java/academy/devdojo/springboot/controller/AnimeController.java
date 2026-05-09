@@ -12,6 +12,7 @@ import academy.devdojo.springboot.dominio.Anime;
 import academy.devdojo.springboot.util.DateUtil;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -27,6 +28,11 @@ public class AnimeController {
     public ResponseEntity<List<Anime>> list() {
         log.info(dateUtil.formatLocalDateTimeToDataBaseStyle(LocalDateTime.now()));
         return new ResponseEntity<>(animeService.listAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/find")
+    public ResponseEntity<List<Anime>> findByName(@RequestParam(required = false) String name) {
+        return ResponseEntity.ok(animeService.findByName(name));
     }
 
     @GetMapping(path = "/{id}")
