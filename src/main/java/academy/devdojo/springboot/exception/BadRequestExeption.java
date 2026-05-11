@@ -1,4 +1,4 @@
-package academy.devdojo.springboot.exeption;
+package academy.devdojo.springboot.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

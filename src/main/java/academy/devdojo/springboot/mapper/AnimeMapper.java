@@ -6,7 +6,10 @@ import academy.devdojo.springboot.request.AnimePutRequestBody;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel =  "spring")
+//Anotações:
+//{1} --- Diz ao MapStruct para gerar automaticamente a implementação do mapper e registrar como bean do Spring.
+
+@Mapper(componentModel =  "spring") //{1}
 public abstract class AnimeMapper {
     public static final AnimeMapper INSTANCE = Mappers.getMapper(AnimeMapper.class);
     public abstract Anime toAnime(AnimePostRequestBody animePostRequestBody);
