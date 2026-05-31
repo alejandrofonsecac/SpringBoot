@@ -1,0 +1,20 @@
+package academy.devdojo.springboot.configurer;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+
+@Configuration
+public class DevDojoWebMvcConfigurer implements WebMvcConfigurer {
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        //Essa parte serve para conseguir configurar as paginas dos elementos
+        PageableHandlerMethodArgumentResolver pageHandler = new PageableHandlerMethodArgumentResolver();
+        pageHandler.setFallbackPageable(PageRequest.of(0, 1));
+        resolvers.add(pageHandler);
+    }
+}

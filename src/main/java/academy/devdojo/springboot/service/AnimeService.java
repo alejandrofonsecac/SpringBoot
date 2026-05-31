@@ -8,6 +8,8 @@ import academy.devdojo.springboot.request.AnimePostRequestBody;
 import academy.devdojo.springboot.request.AnimePutRequestBody;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -17,14 +19,18 @@ import java.util.List;
 
 //{2} --- Lombok cria construtor com os atributos final (injeção de dependência).
 
-//{3} --- Executa o metodo dentro de uma transação; se der erro, desfaz tudo (rollback).
+//{3} --- Executa o metodo dentro de uma transação; se der erro, desfaz tudo (rollback). Usando como exemplo o save dos dados no banco de dados, caso   o save der errado o Transactional nao permite que com as inform,ações ja enviadas ele faça um cadastro  no banco de dados
 
 @Service // {1}
 @RequiredArgsConstructor// {2}
 public class AnimeService{
     private final AnimeRepository animeRepository;
 
-    public List<Anime> listAll(){
+    public Page<Anime> listAll(Pageable pageable){
+        return animeRepository.findAll(pageable);
+    }
+
+    public List<Anime> listAllNonPagaeable() {
         return animeRepository.findAll();
     }
 
