@@ -3,6 +3,7 @@ package academy.devdojo.springboot.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import academy.devdojo.springboot.dominio.Anime;
+import jakarta.validation.ConstraintViolationException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,8 +64,9 @@ class AnimeRepositoryTest {
 
         List<Anime> animes = this.animeRepository.findByName(name);
 
-        Assertions.assertThat(animes.isEmpty()).isFalse();
-        Assertions.assertThat(animes).contains(animeSaved);
+        Assertions.assertThat(animes)
+                .isNotEmpty()
+                .contains(animeSaved);
     }
 
     @Test
@@ -72,6 +74,19 @@ class AnimeRepositoryTest {
     void findByName_ReturnsEmptyList_WhenAnimeNotFound(){
         List<Anime> animes = this.animeRepository.findByName("testx");
         Assertions.assertThat(animes).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Save throw ConstraintValidationException when name is empty")
+    void save_ConstraintViolationException_WhenNameIsEmpty(){
+        Anime anime = new Anime();
+//        Assertions.assertThatThrownBy(() -> this.animeRepository.save(anime))
+//                .isInstanceOf(ConstraintViolationException.class);
+
+        Assertions.assertThatExceptionOfType(ConstraintViolationException.class)
+                .isThrownBy(() -> this.animeRepository.save(anime))
+                .withMessageContaining("The anime canot be empty");
+        //Teste esta funcionando pois o anime sendo criado esta vazio
     }
 
     private Anime  createAnime(){

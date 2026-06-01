@@ -1,6 +1,7 @@
 package academy.devdojo.springboot.dominio;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class Anime {
     @Id //Define o campo como chave primária
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID é gerado automaticamente pelo banco
     private Long id;
+    @NotEmpty(message = "The anime name cannot be null")
     private String name;
 
 }
