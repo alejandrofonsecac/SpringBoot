@@ -33,6 +33,22 @@ import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class AnimeServiceTest {
+
+    //---ANOTAÇÕES---
+
+    //MockitoAnnotations.openMocks(this) ((ExtendWith)) -> E ele que inicializa o Mock e o InjectMock (no caso de estarmos usando o MockitoExtension
+
+    // == @Mock -> Mock significa "objeto simulado". Isso usamos essa anotação para não comprometer nenhum dado ou código, somente simular o dado para o teste
+    // == @InjectMocks -> Como com o Mock determinado e criado o InjectMocks serve para inventar determinado mock na classe de testes... EX: @InjectMocks
+    //      private AnimeService service; o mock faz -> service = new AnimeService(repository); automaticamente
+
+    // == @BeforeEach -> Ele serve para, criar objetos, configurar mocks... ex se temos 15 métodos o BeforeEach (setup) sera executado 15 vezes para configurar cada Mock ( no exemplo desta classe), o fluxo ficando @BeforeEach -> @Test -> @BeforeEach -> @Test -> @BeforeEach...
+
+    // == When / thenReturn -> o When serve para fazer o Mock responder (tradução direta when->quando), ou seja .when(repository.findById), quando respository.findbyid() for          chamado...
+    //      Agora na parte de thenReturn funciona como um complemento que seria, quando o repository for chamado você retorna determinada ação
+
+    // == lenient() -> serve para deixar o mock menos rigídos, e muito usado para quando o mock será usado para vários métodos. Resumidamente, ele ignora mocks não utilizados
+
     @InjectMocks
     private AnimeService animeService;
     @Mock
