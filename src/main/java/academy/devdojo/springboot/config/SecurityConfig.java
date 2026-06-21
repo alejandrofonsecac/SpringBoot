@@ -19,12 +19,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 //*
 //    O que é CSRF?
-//        Imagine que você esta logado no seu banco e recebe um link que faz você transferir x              quantidade de dinheiro. O seu navegador ve que você ja esta logado e automaticamente             executa a URL. Para impedir isso usamos ** CSRF **
+//        Imagine que você esta logado no seu banco e recebe um link que faz você transferir x quantidade de dinheiro. O seu navegador ve que você já está logado e automaticamente executa a URL. Para impedir isso usamos ** CSRF **
 //
 //    Quando usar CookieCSRFTokenRepository?
-//        Em um cenário de aplicação web. Aonde tenha Angular, React ou aplicação parecida. O               ideal é não usar quando usamos JWT e API REST. Nesse cenário fazer: http.csrf                    (AbstractHttpConfigurer::disable);
+//        Em um cenário de aplicação web. Aonde tenha Angular, React ou aplicação parecida. O ideal é não usar quando usamos JWT e API REST. Nesse cenário fazer: http.csrf(AbstractHttpConfigurer::disable);
 
-//    O CookieCSRFTokenRepository é responsável por criar o cookie XSRF-TOKEN. Dessa forma usado        com o withHttpOnlyFalse() permite *document.coookie* que é muito usado em Angular e React
+//    O CookieCSRFTokenRepository é responsável por criar o cookie XSRF-TOKEN. Dessa forma usado com o withHttpOnlyFalse() permite *document.coookie* que é muito usado em Angular e React
 
 //    O CsrfTokenRequestAttributeHandler é responsável por ler o X-XSRF-TOKEN
 
