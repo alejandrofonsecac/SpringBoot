@@ -14,7 +14,7 @@ public class DevDojoWebMvcConfigurer implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         //Essa parte serve para conseguir configurar as paginas dos elementos
         PageableHandlerMethodArgumentResolver pageHandler = new PageableHandlerMethodArgumentResolver();
-        pageHandler.setFallbackPageable(PageRequest.of(0, 1));
+        pageHandler.setFallbackPageable(PageRequest.of(0, 5));
         resolvers.add(pageHandler);
     }
 }
