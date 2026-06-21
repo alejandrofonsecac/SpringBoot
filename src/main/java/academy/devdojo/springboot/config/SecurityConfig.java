@@ -3,9 +3,11 @@ package academy.devdojo.springboot.config;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -13,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-
 import static org.springframework.security.config.Customizer.withDefaults;
 
 
@@ -61,8 +62,43 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 //{6}
 // Autenticação Basic.
+
+
+// ------------------------------------//---------------------------------//
+
+//{7}
+// O EnableMethodSecurity permite configurar camadas de seguranças conforme a permissão do usuário. Por exemplo, se temos o usuário querendo realizar um request POST, entretanto ele e um usuário e não admin essa camada bloqueia a permissão do usuário, ele pode apenas realizar o POST se ele tiver o login de admin
+
+//{8}
+//securedEnabled = true: Habilita o suporte para a @Securedanotação mais antiga. É uma maneira legada de restringir o acesso a métodos, especificando uma lista de funções obrigatórias (por exemplo, @Secured("ROLE_ADMIN"))
+
+//{9}
+//jsr250Enabled = true: Ativa o suporte para anotações padrão do Java EE, principalmente @RolesAllowed. Isso permite proteger métodos usando critérios baseados em padrões (por exemplo, @RolesAllowed("ADMIN")).
+
+//E possível usar mais de uma regra para uma requisição. Por exemplo: **@PreAuthorize("hasAnyRole('ADMIN','MANAGER')")**, dessa maneira temos 2 regras para uma requisição que pode ser tanto POST, tanto GET.
+
+//--- Roles x Authorities
+
+//Roles representam papéis do usuário, já as Authorities representam o que o usuário pode fazer.
+// Exemplo: **User.withUsername("admin")
+//    .roles("ADMIN")
+//    .authorities("anime:delete", "anime:update")
+//    .build();**
+//  ---> Assim você esta dizendo que o Admin tera tal autoridades
+
+//Verificação? -> Controller
+    //Verificação de Roles:
+    //**@PreAuthorize("hasRole('ADMIN')")**
+
+    //Verificação de Authorities:
+    //**@PreAuthorize("hasAuthority('anime:delete')")**
+
 @Log4j2
 @Configuration
+@EnableMethodSecurity( //{7}
+        securedEnabled = true, //{8}
+        jsr250Enabled = true//{9}
+)
 public class SecurityConfig {
 
     @Bean
@@ -73,7 +109,7 @@ public class SecurityConfig {
     // Cadeia de filtros do Spring Security.
     // Substitui o antigo WebSecurityConfigurerAdapter.
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http){
 
         http
                 .csrf(csrf -> csrf //{2}
@@ -99,14 +135,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(
+    public UserDetailsService userDetailsService(
             PasswordEncoder passwordEncoder) {
+
+        UserDetails admin = User.withUsername("admin")
+                .password(passwordEncoder().encode("123"))
+                .roles("ADMIN")
+                .build();
 
         UserDetails user = User.withUsername("Jorge")
                 .password(passwordEncoder.encode("balda"))
                 .roles("USER", "ADMIN")
                 .build();
 
-        return new InMemoryUserDetailsManager(user);
+        return new InMemoryUserDetailsManager(admin, user);
     }
 }
