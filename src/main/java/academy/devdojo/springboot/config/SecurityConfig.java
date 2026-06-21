@@ -93,6 +93,53 @@ import static org.springframework.security.config.Customizer.withDefaults;
     //Verificação de Authorities:
     //**@PreAuthorize("hasAuthority('anime:delete')")**
 
+
+/**
+ * {7} --> Define o nome do atributo onde o token vai ficar na requisição se necessário
+ * {8} --> O FormLogin faz com que o Spring crie uma interface basica de login
+ *
+ * <p>
+ *
+ * --> BasicAuthenticationFilter ou UsernamePasswordAuthenticationFilter
+ *      Eles capturam as credenciais, autenticam o usuário e colocam um objeto de "Autenticação" dentro do contexto de segurança do Spring (chamado SecurityContextHolder).
+ *
+ * <p>
+ *
+ * ---BasicAuthenticationFilter vs UsernamePasswordAuthenticationFilter
+ *      BasicAuthenticationFilter: É ativado quando você usa .httpBasic(). Ele inspeciona o cabeçalho HTTP da requisição atrás de credenciais codificadas em Base64 (enviadas no formato Authorization: Basic dXN1YXJpbzpzZW5oYQ==). É muito usado em APIs REST puras e testes rápidos (como Postman).
+ *
+ * <p>
+ *
+ *      UsernamePasswordAuthenticationFilter: É ativado quando você usa .formLogin(). Ele intercepta uma requisição do tipo POST enviada para a URL de login e lê os dados que vieram do formulário (os campos username e password).
+ *
+ * <p>
+ *      * <p>
+ *  * --- FilterSecurityInterceptor
+ *  *      Este fica mais ao final. Ele decide se o usuário autenticado tem a Autorização (permissão/roles) necessária para acessar o endpoint solicitado.
+ *  * <p>
+ *
+ *      ex de código:
+ * public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+ *     http
+ *         .csrf(csrf -> csrf.disable()) // Desabilitado apenas para o exemplo ficar limpo
+ *         .authorizeHttpRequests(auth -> auth
+ *             // [AQUI VOCÊ CONFIGURA O FilterSecurityInterceptor / AuthorizationFilter]
+ *             // Você diz a ele quais rotas ele deve vigiar e quais permissões checar.
+ *             .requestMatchers("/animes/admin/**").hasRole("ADMIN")
+ *             .anyRequest().authenticated()
+ *         )
+ *         // [AQUI VOCÊ ATIVA O UsernamePasswordAuthenticationFilter]
+ *         // Ao colocar essa linha, o Spring injeta o filtro de formulário na cadeia.
+ *         .formLogin(withDefaults())
+ * <p>
+ *         // [AQUI VOCÊ ATIVA O BasicAuthenticationFilter]
+ *         // Ao colocar essa linha, o Spring injeta o filtro que lê o cabeçalho "Authorization: Basic".
+ *         .httpBasic(withDefaults());
+ * <p>
+ *     return http.build();
+ * }
+ */
+
 @Log4j2
 @Configuration
 @EnableMethodSecurity( //{7}
@@ -108,24 +155,47 @@ public class SecurityConfig {
 
     // Cadeia de filtros do Spring Security.
     // Substitui o antigo WebSecurityConfigurerAdapter.
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//
+//        http
+//                .csrf(csrf -> csrf //{2}
+//                        .csrfTokenRepository( //{3}
+//                                CookieCsrfTokenRepository.withHttpOnlyFalse()
+//                        )
+//                        .csrfTokenRequestHandler(//{4}
+//                                new CsrfTokenRequestAttributeHandler()
+//                        )
+//                )
+//                .authorizeHttpRequests(auth -> //{5}
+//                        auth.anyRequest().authenticated()
+//                ).formLogin(form -> form
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/home", true)
+//                        .permitAll()
+//                )
+//                .httpBasic(withDefaults());//{6}
+//        return http.build();
+//    }
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http){
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");//{7}
 
         http
-                .csrf(csrf -> csrf //{2}
-                        .csrfTokenRepository( //{3}
-                                CookieCsrfTokenRepository.withHttpOnlyFalse()
-                        )
-                        .csrfTokenRequestHandler(//{4}
-                                new CsrfTokenRequestAttributeHandler()
-                        )
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(requestHandler)
                 )
-
-                .authorizeHttpRequests(auth -> //{5}
-                        auth.anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated()
                 )
+                // Se for usar apenas Postman ou chamadas diretas REST, remova o .formLogin() temporariamente
+                // ou use o .formLogin(withDefaults()) para o Spring gerar a tela padrão sem quebrar a rota do seu app.
+                .formLogin(withDefaults()) //{8}
+                .httpBasic(withDefaults());
 
-                .httpBasic(withDefaults());//{6}
         return http.build();
     }
 

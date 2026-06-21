@@ -10,8 +10,3 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-logging:
-  level:
-    org.springframework.security: TRACE
-    org.springframework.security.web.csrf: TRACE

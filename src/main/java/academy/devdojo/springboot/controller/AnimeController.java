@@ -11,10 +11,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import academy.devdojo.springboot.dominio.Anime;
 import academy.devdojo.springboot.util.DateUtil;
 import java.util.List;
+
+/**
+ *
+ * {1} -> O AuthenticationPrincipal
+ *      Ela serve para injetar diretamente o usuário que está logado na sessão atual. Ver nome ou dados do usuário (funcionando como um get)
+ */
 
 @RestController
 @RequestMapping("animes")
@@ -42,6 +50,12 @@ public class AnimeController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Anime> finById(@PathVariable("id") long id) {
+        return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestExeption(id));
+    }
+
+    @GetMapping(path = "/by-id/{id}")
+    public ResponseEntity<Anime> finByIdAuthenticationPrincipal(@PathVariable("id") long id, @AuthenticationPrincipal UserDetails userDetails) {//{1}
+        log.info(userDetails.getUsername());
         return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestExeption(id));
     }
 
