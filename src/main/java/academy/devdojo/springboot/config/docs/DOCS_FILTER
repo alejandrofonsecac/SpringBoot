@@ -1,0 +1,31 @@
+--> BasicAuthenticationFilter ou UsernamePasswordAuthenticationFilter
+       Eles capturam as credenciais, autenticam o usuário e colocam um objeto de "Autenticação" dentro do contexto de segurança do Spring (chamado SecurityContextHolder).
+
+ ---BasicAuthenticationFilter vs UsernamePasswordAuthenticationFilter
+       BasicAuthenticationFilter: É ativado quando você usa .httpBasic(). Ele inspeciona o cabeçalho HTTP da requisição atrás de credenciais codificadas em Base64 (enviadas no formato Authorization: Basic dXN1YXJpbzpzZW5oYQ==). É muito usado em APIs REST puras e testes rápidos (como Postman).
+
+       UsernamePasswordAuthenticationFilter: É ativado quando você usa .formLogin(). Ele intercepta uma requisição do tipo POST enviada para a URL de login e lê os dados que vieram do formulário (os campos username e password).
+
+ --- FilterSecurityInterceptor
+       Este fica mais ao final. Ele decide se o usuário autenticado tem a Autorização (permissão/roles) necessária para acessar o endpoint solicitado.
+
+ --------------------------------------------
+       ex de código:
+      public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+          http
+              .csrf(csrf -> csrf.disable()) // Desabilitado apenas para o exemplo ficar limpo
+              .authorizeHttpRequests(auth -> auth
+                  // [AQUI VOCÊ CONFIGURA O FilterSecurityInterceptor / AuthorizationFilter]
+                  // Você diz a ele quais rotas ele deve vigiar e quais permissões checar.
+                  .requestMatchers("/animes/admin/**").hasRole("ADMIN")
+                  .anyRequest().authenticated()
+              )
+              // [AQUI VOCÊ ATIVA O UsernamePasswordAuthenticationFilter]
+              // Ao colocar essa linha, o Spring injeta o filtro de formulário na cadeia.
+              .formLogin(withDefaults())
+
+              // [AQUI VOCÊ ATIVA O BasicAuthenticationFilter]
+              // Ao colocar essa linha, o Spring injeta o filtro que lê o cabeçalho "Authorization: Basic".
+             .httpBasic(withDefaults());
+
+          return http.build();

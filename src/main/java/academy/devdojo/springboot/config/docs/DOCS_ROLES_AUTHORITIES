@@ -1,0 +1,20 @@
+**
+    Camadas de Segurança
+
+        --> ROLES e AUTHORITIES
+
+            Roles representam papéis do usuário, já as Authorities representam o que o usuário pode fazer.
+                 Exemplo: **User.withUsername("admin")
+                    .roles("ADMIN")
+                    .authorities("anime:delete", "anime:update")
+                    .build();**
+                  ---> Assim você esta dizendo que o Admin tera tal autoridades
+
+            Verificação? -> Controller
+                Verificação de Roles:
+                **@PreAuthorize("hasRole('ADMIN')")**
+
+                Verificação de Authorities:
+                **@PreAuthorize("hasAuthority('anime:delete')")**
+
+

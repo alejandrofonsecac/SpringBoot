@@ -67,6 +67,7 @@ public class AnimeController {
     }
 
     //Delete e id Potent -> Ver mais sobre isso
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id){
         animeService.delete(id);
