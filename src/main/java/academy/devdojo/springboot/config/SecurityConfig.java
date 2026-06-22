@@ -1,21 +1,24 @@
 package academy.devdojo.springboot.config;
 
+import academy.devdojo.springboot.service.DevDojoUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 
 //*
@@ -146,7 +149,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
         securedEnabled = true, //{8}
         jsr250Enabled = true//{9}
 )
-public class SecurityConfig {
+@RequiredArgsConstructor
+public class SecurityConfig{
+    private final DevDojoUserService devDojoUserService;
 
     @Bean
     public CsrfTokenRequestHandler requestHandler() {
@@ -178,46 +183,86 @@ public class SecurityConfig {
 //        return http.build();
 //    }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+//        requestHandler.setCsrfRequestAttributeName("_csrf");//{7}
+//
+//        http
+//                .csrf(csrf -> csrf
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                        .csrfTokenRequestHandler(requestHandler)
+//                )
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().authenticated()
+//                )
+//                // Se for usar apenas Postman ou chamadas diretas REST, remova o .formLogin() temporariamente
+//                // ou use o .formLogin(withDefaults()) para o Spring gerar a tela padrão sem quebrar a rota do seu app.
+//                .formLogin(withDefaults()) //{8}
+//                .httpBasic(withDefaults());
+//
+//        return http.build();
+//    }
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().authenticated()
+//                )
+//                .httpBasic(Customizer.withDefaults());
+//
+//        return http.build();
+//    }
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");//{7}
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            DaoAuthenticationProvider provider)
+            throws Exception {
 
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(requestHandler)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()
-                )
-                // Se for usar apenas Postman ou chamadas diretas REST, remova o .formLogin() temporariamente
-                // ou use o .formLogin(withDefaults()) para o Spring gerar a tela padrão sem quebrar a rota do seu app.
-                .formLogin(withDefaults()) //{8}
-                .httpBasic(withDefaults());
+                .authenticationProvider(provider)
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth ->
+                        auth.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public DaoAuthenticationProvider authenticationProvider(
+            PasswordEncoder passwordEncoder) {
+        log.info("Password encoder: {}", passwordEncoder);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(devDojoUserService);
+
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
+//    @Bean
+//    public UserDetailsService userDetailsService(
+//            PasswordEncoder passwordEncoder) {
+//
+//        UserDetails admin = User.withUsername("admin")
+//                .password(passwordEncoder().encode("123"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        UserDetails user = User.withUsername("Jorge")
+//                .password(passwordEncoder.encode("balda"))
+//                .roles("USER", "ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(admin, user);
+//    }
+
     @Bean
-    public UserDetailsService userDetailsService(
-            PasswordEncoder passwordEncoder) {
-
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder().encode("123"))
-                .roles("ADMIN")
-                .build();
-
-        UserDetails user = User.withUsername("Jorge")
-                .password(passwordEncoder.encode("balda"))
-                .roles("USER", "ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin, user);
+    public PasswordEncoder passwordEncoder() {
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        System.out.println(encoder.encode("123"));
+        return encoder;
     }
 }
