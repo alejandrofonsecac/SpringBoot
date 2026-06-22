@@ -53,7 +53,6 @@ public class AnimeController {
         return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestExeption(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(path = "/by-id/{id}")
     public ResponseEntity<Anime> finByIdAuthenticationPrincipal(@PathVariable("id") long id, @AuthenticationPrincipal UserDetails userDetails) {//{1}
         log.info(userDetails.getUsername());
@@ -67,8 +66,7 @@ public class AnimeController {
     }
 
     //Delete e id Potent -> Ver mais sobre isso
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/admin/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id){
         animeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

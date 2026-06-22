@@ -46,6 +46,22 @@ public class SecurityConfig{
     }
 
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(
+//            HttpSecurity http,
+//            DaoAuthenticationProvider provider)
+//            throws Exception {
+//
+//        http
+//                .authenticationProvider(provider)
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(auth ->
+//                        auth.anyRequest().authenticated())
+//                .httpBasic(Customizer.withDefaults());
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -53,10 +69,13 @@ public class SecurityConfig{
             throws Exception {
 
         http
-                .authenticationProvider(provider)
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/animes/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/animes/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form.loginPage("/login"))
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
