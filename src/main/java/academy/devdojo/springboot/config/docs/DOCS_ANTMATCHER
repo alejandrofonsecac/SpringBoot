@@ -1,0 +1,17 @@
+**
+    ANTMATCHER
+
+        Uma alternativa para podermos proteger as nossas URL's e gerencias as regras de permissões para os usuários são os antmatcher...
+
+        Ex de código:
+            http
+                            .csrf(AbstractHttpConfigurer::disable)
+                            .authorizeHttpRequests(authorize -> authorize
+                                    .requestMatchers("/animes/admin/**").hasRole("ADMIN") ----{1}
+                                    .requestMatchers("/animes/**").hasAnyRole("USER", "ADMIN") ----{2}
+                                    .anyRequest().authenticated()
+                            )
+                            .formLogin(form -> form.loginPage("/login"))
+                            .httpBasic(Customizer.withDefaults());
+
+            {1} -> Com a URL "/animes/admin/**" estamos falando que a requisição que será enviada somente será possível se a url estivem com o /admin. E não só isso, tudo depois do /admin/ tem que ser com a ROLE 'ADMIN'. A mesma coisa funciona para o USER e outras ROLES
