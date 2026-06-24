@@ -32,6 +32,7 @@ public class DevDojoUser implements UserDetails {
 
     @NotEmpty(message = "The anime name cannot be null")
     private String name;
+    @NotEmpty(message = "The anime name cannot be null")
     private String username;
     private String password;
     private String authorities; //ROLE_ADMIN, ROLE_ADMIN...

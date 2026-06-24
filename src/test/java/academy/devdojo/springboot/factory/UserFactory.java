@@ -4,8 +4,9 @@ import academy.devdojo.springboot.dominio.DevDojoUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserFactory {
-    public static DevDojoUser user(PasswordEncoder passwordEncoder){
+    public static DevDojoUser createUser(PasswordEncoder passwordEncoder){
         return DevDojoUser.builder()
+                .name("Matheus Zanella")
                 .username("matheus")
                 .password(
                         passwordEncoder.encode("123")
@@ -14,8 +15,9 @@ public class UserFactory {
                 .build();
     }
 
-    public static DevDojoUser admin(PasswordEncoder passwordEncoder){
+    public static DevDojoUser createAdmin(PasswordEncoder passwordEncoder){
         return DevDojoUser.builder()
+                .name("Christofer")
                 .username("chris")
                 .password(
                         passwordEncoder.encode("123")
