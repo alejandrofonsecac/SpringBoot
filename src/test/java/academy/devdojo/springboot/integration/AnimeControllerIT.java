@@ -285,13 +285,16 @@ public class AnimeControllerIT {
         HttpEntity<AnimePutRequestBody> requestEntity =
                 new HttpEntity<>(request);
 
-        ResponseEntity<Void> response =
+        ResponseEntity<String> response =
                 adminRestTemplate.exchange(
-                        "/admin/replace",
+                        "/animes/admin/replace",
                         HttpMethod.PUT,
                         requestEntity,
-                        Void.class
+                        String.class
                 );
+
+        System.out.println(response.getStatusCode());
+        System.out.println(response.getBody());
 
         assertThat(response.getStatusCode())
                 .isEqualTo(HttpStatus.NO_CONTENT);

@@ -9,10 +9,10 @@ import org.mapstruct.factory.Mappers;
 //Anotações:
 //{1} --- Diz ao MapStruct para gerar automaticamente a implementação do mapper e registrar como bean do Spring.
 
-@Mapper(componentModel =  "spring") //{1}
-public abstract class AnimeMapper {
-    public static final AnimeMapper INSTANCE = Mappers.getMapper(AnimeMapper.class);
-    public abstract Anime toAnime(AnimePostRequestBody animePostRequestBody);
-    public abstract Anime toAnime(AnimePutRequestBody animePutRequestBody);
+@Mapper(componentModel = "spring")
+public interface AnimeMapper {
 
+    Anime toAnime(AnimePostRequestBody animePostRequestBody);
+
+    Anime toAnime(AnimePutRequestBody animePutRequestBody);
 }

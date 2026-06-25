@@ -8,6 +8,7 @@ import academy.devdojo.springboot.request.AnimePostRequestBody;
 import academy.devdojo.springboot.request.AnimePutRequestBody;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ import java.util.List;
 @Service // {1}
 @RequiredArgsConstructor// {2}
 public class AnimeService{
+    @Autowired
+    private final AnimeMapper animeMapper;
     private final AnimeRepository animeRepository;
 
     public Page<Anime> listAll(Pageable pageable){
@@ -46,7 +49,7 @@ public class AnimeService{
 
     @Transactional(rollbackOn = Exception.class)//{3}
     public Anime save(AnimePostRequestBody animePostRequestBody) {
-        return animeRepository.save(AnimeMapper.INSTANCE.toAnime(animePostRequestBody));
+        return animeRepository.save(animeMapper.toAnime(animePostRequestBody));
     }
 
     public void delete(long id) {
@@ -54,9 +57,14 @@ public class AnimeService{
     }
 
     public void replace(AnimePutRequestBody animePutRequestBody) {
-        Anime savedAnime = findByIdOrThrowBadRequestExeption(animePutRequestBody.getId());
-        Anime anime = AnimeMapper.INSTANCE.toAnime(animePutRequestBody);
+        Anime savedAnime =
+                findByIdOrThrowBadRequestExeption(
+                        animePutRequestBody.getId());
+
+        Anime anime = animeMapper.toAnime(animePutRequestBody);
+
         anime.setId(savedAnime.getId());
+
         animeRepository.save(anime);
     }
 }
