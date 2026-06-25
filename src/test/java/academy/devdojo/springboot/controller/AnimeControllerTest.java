@@ -14,7 +14,6 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,22 +27,22 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 
-//SpringExtension nao inizializa itens do Mockito automaticamente... Para inicializar de forma automatica deve-se usar Mockito class
+//SpringExtension não inicializa itens do Mockito automaticamente... Para inicializar de forma automática deve-se usar Mockito class
 
 @ExtendWith(MockitoExtension.class)
 class AnimeControllerTest {
 
     @InjectMocks
-    // Quando voce quer testar a classe em si
+    // Quando você quer testar a classe em si
     private AnimeController animeController;
 
     @Mock
-    //VOce utiliza para todas as classes que estao sendo utilizadas em AnimeController
+    //Você utiliza para todas as classes que estão a ser utilizadas em AnimeController
     private AnimeService animeServiceMock;
 
 
-    //lenient pódemos usar quando temos varios metodos.
-    //Podemos quando temos ppoucos testes por classe usar cada mockito especificadamente em cada teste para melhor visualização, mas como contra o codigo fica um pouco mais "sujo"
+    //lenient pódemos usar quando temos vários métodos.
+    //Podemos quando temos poucos testes por classe usar cada mockito especificamente em cada teste para melhor visualização, mas como contra o código fica um pouco mais "sujo"
     @BeforeEach
     void setUp() {
         PageImpl<Anime> animePage =
@@ -142,7 +141,6 @@ class AnimeControllerTest {
     @Test
     @DisplayName("save returns list of anime when successful")
     void save_ReturnsAnime_WhenSuccessful() {
-        Long expectedId = AnimeCreator.createValidAnime().getId();
         Anime anime = animeController.save(AnimePostRequestBodyCreator.createAnimePostRequestBody()).getBody();
 
         Assertions.assertThat(anime)

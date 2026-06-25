@@ -133,26 +133,27 @@ public class AnimeControllerIT {
                 .isEqualTo("AnimeTest");
     }
 
-    //Expected error (401)
     @Test
-    void save_CreateAnime401_WhenUserNotAuthenticated() {
+    void save_Returns401_WhenUserIsNotAdmin() {
 
-        AnimePostRequestBody animeTest = AnimePostRequestBody.builder()
-                .name("AnimeTest")
-                .build();
+        AnimePostRequestBody animeTest =
+                AnimePostRequestBody.builder()
+                        .name("AnimeTest")
+                        .build();
 
-        ResponseEntity<Anime> response =
-                userRestTemplate.postForEntity(
+        ResponseEntity<String> response =
+                testRestTemplate.postForEntity(
                         "/animes/admin",
                         animeTest,
-                        Anime.class);
+                        String.class
+                );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    //Expected error (403)
     @Test
-    void save_CreateAnime201_WhenUserAuthenticated() {
+    void save_CreateAnime403_WhenUserAuthenticated() {
 
         AnimePostRequestBody animeTest = AnimePostRequestBody.builder()
                 .name("AnimeTest")
@@ -165,13 +166,7 @@ public class AnimeControllerIT {
                         Anime.class);
 
         assertThat(response.getStatusCode())
-                .isEqualTo(HttpStatus.CREATED);
-
-        assertThat(response.getBody())
-                .isNotNull();
-
-        assertThat(response.getBody().getName())
-                .isEqualTo("AnimeTest");
+                .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -186,14 +181,13 @@ public class AnimeControllerIT {
                         "/animes/admin",
                         animeTest,
                         Anime.class);
-
         assertThat(response.getStatusCode())
                 .isEqualTo(HttpStatus.CREATED);
 
         assertThat(response.getBody())
                 .isNotNull();
 
-        assertThat(response.getBody().getName())
+        assertThat(response.getBody() != null ? response.getBody().getName() : null)
                 .isEqualTo("AnimeTest");
     }
 
@@ -208,7 +202,7 @@ public class AnimeControllerIT {
         );
 
         ResponseEntity<Void> response =
-                userRestTemplate.exchange(
+                testRestTemplate.exchange(
                         "/animes/admin",
                         HttpMethod.DELETE,
                         null,
@@ -219,9 +213,8 @@ public class AnimeControllerIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    //Error Expected 403
     @Test
-    void delete_RemovesAnime204_WhenUserAuthenticated() {
+    void delete_RemovesAnime403_WhenUserAuthenticated() {
         Anime animeSaved = animeRepository.save(
                 Anime.builder()
                         .name("Naruto")
@@ -238,10 +231,7 @@ public class AnimeControllerIT {
                 );
 
         assertThat(response.getStatusCode())
-                .isEqualTo(HttpStatus.NO_CONTENT);
-
-        assertThat(animeRepository.findById(animeSaved.getId()))
-                .isEmpty();
+                .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -266,6 +256,64 @@ public class AnimeControllerIT {
 
         assertThat(animeRepository.findById(animeSaved.getId()))
                 .isEmpty();
+    }
+
+    @Test
+    void put_ReplaceAnime401_WhenUserNotAuthenticated() {
+
+        Anime animeSaved = animeRepository.save(
+                Anime.builder()
+                        .name("AnimeGenerics")
+                        .build()
+        );
+
+        AnimePutRequestBody request = AnimePutRequestBody.builder()
+                .id(animeSaved.getId())
+                .name("AnimeTestReplace")
+                .build();
+
+        HttpEntity<AnimePutRequestBody> requestEntity =
+                new HttpEntity<>(request);
+
+        ResponseEntity<String> response =
+                testRestTemplate.exchange(
+                        "/animes/admin/replace",
+                        HttpMethod.PUT,
+                        requestEntity,
+                        String.class
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void put_Returns403_WhenUserAuthenticated() {
+        Anime animeSaved = animeRepository.save(
+                Anime.builder()
+                        .name("AnimeGenerics")
+                        .build()
+        );
+
+        AnimePutRequestBody request =
+                AnimePutRequestBody.builder()
+                        .id(animeSaved.getId())
+                        .name("AnimeTestReplace")
+                        .build();
+
+        HttpEntity<AnimePutRequestBody> requestEntity =
+                new HttpEntity<>(request);
+
+        ResponseEntity<String> response =
+                userRestTemplate.exchange(
+                        "/animes/admin/replace",
+                        HttpMethod.PUT,
+                        requestEntity,
+                        String.class
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test

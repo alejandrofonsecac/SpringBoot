@@ -30,7 +30,6 @@ import java.util.List;
 @Log4j2
 public class AnimeController {
 
-    private final DateUtil dateUtil;
     private final AnimeService animeService;
 
     @GetMapping

@@ -30,6 +30,10 @@ import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 
 //E possível usar mais de uma regra para uma requisição. Por exemplo: **@PreAuthorize("hasAnyRole('ADMIN','MANAGER')")**, dessa maneira temos 2 regras para uma requisição que pode ser tanto POST, tanto GET.
 
+/**
+ * {10} No momento removi o .formLogin pois estava dando conflito com os SpringSecurityTest, pois nos testes estavamos verificando a API e o formLogin confundia o algoritmo e ele se perguntava se protegia uma API ou uma página WEB
+ */
+
 @Log4j2
 @Configuration
 @EnableMethodSecurity( //{7}
@@ -78,7 +82,7 @@ public class SecurityConfig{
                         .anyRequest()
                         .authenticated()
                 )
-                .formLogin(form -> form.loginPage("/login"))
+//                .formLogin(form -> form.loginPage("/login")) {10}
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
