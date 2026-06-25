@@ -25,7 +25,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("animes")
+@RequestMapping("/animes")
 @RequiredArgsConstructor
 @Log4j2
 public class AnimeController {
@@ -43,7 +43,7 @@ public class AnimeController {
         return ResponseEntity.ok(animeService.listAllNonPagaeable());
     }
 
-    @GetMapping(path = "/find")
+    @GetMapping(path = "/findByName")
     public ResponseEntity<List<Anime>> findByName(@RequestParam(required = false) String name) {
         return ResponseEntity.ok(animeService.findByName(name));
     }
@@ -59,7 +59,7 @@ public class AnimeController {
         return ResponseEntity.ok(animeService.findByIdOrThrowBadRequestExeption(id));
     }
 
-    @PostMapping
+    @PostMapping(path = "/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Anime> save(@RequestBody @Valid AnimePostRequestBody anime){
         return new ResponseEntity<>(animeService.save(anime), HttpStatus.CREATED);
@@ -67,12 +67,14 @@ public class AnimeController {
 
     //Delete e id Potent -> Ver mais sobre isso
     @DeleteMapping(path = "/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable long id){
         animeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
+    @PutMapping(path = "/admin/replace")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> replace(@RequestBody AnimePutRequestBody animePutRequestBody){
         animeService.replace(animePutRequestBody);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

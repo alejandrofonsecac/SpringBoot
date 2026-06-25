@@ -71,9 +71,12 @@ public class SecurityConfig{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/animes/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/animes/**").hasAnyRole("USER", "ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/animes/admin/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/animes","/animes/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest()
+                        .authenticated()
                 )
                 .formLogin(form -> form.loginPage("/login"))
                 .httpBasic(Customizer.withDefaults());
